@@ -1,0 +1,468 @@
+ <!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+
+</body>
+<script>
+
+    
+
+    var controlesSendoExibidos = true;
+
+    var zoom = 1;
+    if (localStorage.getItem('zoomPagina')) {
+        document.body.style.zoom = parseFloat(localStorage.getItem('zoomPagina'));
+        zoom = parseFloat(localStorage.getItem('zoomPagina'));
+    }
+    else {
+        localStorage.setItem('zoomPagina', parseFloat(zoom))
+    }
+
+
+
+
+
+
+
+
+    document.body.innerHTML = "<svg id='svg' style='width:100%;height:100%'></svg>"
+    const svg = document.getElementById('svg');
+
+
+
+
+
+    //pre config
+    document.body.style.width = '5000px'
+    document.body.style.height = '5000px'
+    document.body.style.backgroundColor = 'rgb(234, 234, 234)'
+
+
+
+    //menu topo
+    const menu = document.createElement('div')
+    menu.style.width = '100%'
+    //menu.style.height = '15px'
+    menu.style.backgroundColor = 'brown'
+    menu.style.position = 'fixed'
+    menu.style.top = '0px'
+    menu.style.left = '0px'
+    menu.style.color = 'white'
+    menu.style.padding = '6px'
+    menu.style.zIndex = '100'
+    //menu.style.pointerEvents = 'none'
+    menu.style.userSelect = 'none'
+
+
+    menu.innerHTML = `
+    <details>
+    <summary>Opções</summary>
+    <ul>
+        <li id='pp'>Reiniciar</li>
+        <li id='zoomin'>Ampliar +</li>
+        <li id='zoomout'>Diminuir -</li>
+        <li id='Controles'>Exibir/Ocultar Controles</li>
+    </ul>
+</details>
+    `
+
+    document.body.append(menu)
+
+    const pp = document.getElementById('pp')
+    pp.style.cursor = 'pointer'
+    pp.style.padding = '5px'
+
+   // const redesenhar = document.getElementById('redesenhar')
+   // redesenhar.style.cursor = 'pointer'
+   // redesenhar.style.padding = '5px'
+
+    const zoomin = document.getElementById('zoomin')
+    zoomin.style.cursor = 'pointer'
+    zoomin.style.padding = '5px'
+
+    const zoomout = document.getElementById('zoomout')
+    zoomout.style.cursor = 'pointer'
+    zoomout.style.padding = '5px'
+
+    const Controles = document.getElementById('Controles')
+    Controles.style.cursor = 'pointer'
+    Controles.style.padding = '5px'
+
+
+
+
+    Controles.addEventListener('click', () => {
+        if (!controlesSendoExibidos) {
+            ExibirInputColor()
+            controlesSendoExibidos = true
+        }
+        else {
+            ocultarInputColor()
+            controlesSendoExibidos = false
+        }
+    })
+    zoomin.addEventListener('click', () => {
+        zoomIn()
+    })
+    zoomout.addEventListener('click', () => {
+        zoomOut()
+    })
+
+    pp.addEventListener('click', () => {
+        localStorage.clear()
+        window.location.reload()
+    })
+
+  //  redesenhar.addEventListener('click', () => {
+  //      attLinhas()
+  //      //window.location.reload()
+  //  })
+
+
+    var ind = 0; 
+
+
+
+    if (localStorage.getItem(ind + '_x')) {
+        for (let index = 0; index < 1000; index++) {
+            if (localStorage.getItem(index + '_x')) {
+                criar(localStorage.getItem(index + '_pai'), index, localStorage.getItem(index + '_txt'),
+                    localStorage.getItem(index + '_x'),
+                    localStorage.getItem(index + '_y'),
+                    localStorage.getItem(index + '_cor'))
+                //ind++
+            }
+            //ind2++
+
+        }
+
+        attLinhas()
+
+
+
+
+
+
+    }
+    else {
+        criar(0, ind, 'Inicio')
+        localStorage.setItem(ind + '_x', '10px')
+        localStorage.setItem(ind + '_y', '10px')
+        localStorage.setItem(ind + '_txt', 'Inicio')
+        localStorage.setItem(ind + '_cor', 'rgb(221, 213, 213)')
+        localStorage.setItem(ind + '_pai', '0')
+    }
+
+    //console.log(ind)
+    //console.log(ind2)
+
+
+    function criar(father, idd, ctu, xxxxx = '10px', yyyyy = '40px', cor = '#ddd5d5') {
+        if (ctu != '') {
+             
+            console.log('ind: '+ind)
+            const d = document.createElement('div')
+            const i = document.createElement('input')
+            const ic = document.createElement('input')
+            const b = document.createElement('button')
+            const bm = document.createElement('button')
+            const ba = document.createElement('button')
+            const p = document.createElement('p')
+
+
+            ic.id = 'ic_' + idd;
+            i.id = 'i_' + idd;
+            b.id = 'b_' + idd;
+            bm.id = 'bm_' + idd;
+            ba.id = 'ba_' + idd;
+
+
+            //----------------------------------
+            d.style.backgroundColor = 'rgb(221, 213, 213)'
+            d.style.boxShadow = '0px 0px 30px gray'
+            d.style.color = 'rgb(0, 0, 0)'
+            d.style.position = 'absolute'
+            d.style.padding = '10px'
+            d.style.borderEndEndRadius = '5px'
+            //----------------------------------
+
+
+            d.style.width = '200px'
+            d.style.alignContent = 'center'
+            d.style.alignItems = 'center'
+            d.style.textAlign = 'center'
+
+            i.style.width = '96%'
+
+            ic.style.width = '100%'
+            ic.type = 'color'
+
+
+            b.style.width = '100%'
+            bm.style.width = '100%'
+            ba.style.width = '100%'
+
+            p.textContent = ctu;
+            i.placeholder = 'Proximo passo...'
+            //i.value=ctu;
+            b.innerHTML = "Criar";
+            bm.innerHTML = "Movimentar";
+            ba.innerHTML = "Apagar";
+            d.append(p)
+            d.append(i)
+            d.append(ic)
+            d.append(b)
+            if (idd != 0) {
+                d.append(bm)
+                d.append(ba)
+            }
+
+
+            ic.style.border = '1px solid black'
+            ic.style.padding = '0'
+            ic.style.margin = '1px'
+            ic.style.backgroundColor = 'transparent'
+
+            var bol;
+
+
+            ic.value = cor//ver pq n ta funcionando
+
+            if (xxxxx !== '10px') {
+                bol = false;
+                d.style.top = yyyyy
+                d.style.left = xxxxx
+                d.style.backgroundColor = cor
+                //console.log('1')
+            }
+            else {
+                //bol = false;
+                d.style.top = '40px'
+                d.style.left = '10px'
+                d.style.backgroundColor = cor
+                if (document.getElementById(idd - 1)) {
+
+                    bol = true;
+                    d.style.top = document.getElementById(idd - 1).style.top + document.getElementById(idd - 1).style.height
+                    d.style.left = document.getElementById(idd - 1).style.left + document.getElementById(idd - 1).style.width
+
+
+                }
+            }//xxxxx
+
+
+            localStorage.setItem(idd + '_pai', father)
+
+            
+
+            d.id = idd;
+
+
+
+
+            var mouseX = 0;
+            var mouseY = 0;
+            paiAtual = localStorage.getItem(idd + '_pai');
+
+            document.body.append(d)
+            ind++;
+            b.addEventListener('click', () => {
+                criar(d.id, ind, i.value, '10px', '10px', ic.value.toString())
+
+            })
+            ba.addEventListener('click', () => {
+                d.remove()
+                localStorage.removeItem(d.id + '_x')
+                localStorage.removeItem(d.id + '_y')
+                localStorage.removeItem(d.id + '_txt')
+                localStorage.removeItem(d.id + '_cor')
+                localStorage.removeItem(d.id + '_pai')
+
+            })
+
+
+            bm.addEventListener('click', (e) => {
+                bol = !bol;
+                
+            })
+            i.addEventListener('click', (e) => {
+                localStorage.setItem(idd + '_pai',father);
+                paiAtual = localStorage.getItem(idd + '_pai');
+                console.log('storage pai :'+localStorage.getItem(idd + '_pai'))
+            })
+            d.addEventListener('mousedown', (e) => {
+
+                bol = false;
+                localStorage.setItem(idd + '_x', d.style.left)
+                localStorage.setItem(idd + '_y', d.style.top)
+                localStorage.setItem(idd + '_txt', p.textContent)
+                localStorage.setItem(idd + '_cor', d.style.backgroundColor)
+
+                //console.log('paiAtual:'+paiAtual)
+
+                if (document.getElementById(localStorage.getItem(idd + '_pai'))) {
+
+                    //ve se a linha existe e movimenta
+                    if (document.getElementById('linha_' + d.id)) {
+
+                        //console.log('existe')
+                        var pai = localStorage.getItem(idd + '_pai');
+                        var linha = document.getElementById('linha_' + d.id)
+                        linha.setAttribute('x1', parseInt(localStorage.getItem(pai + '_x').replace('px','')) + 100)
+                        linha.setAttribute('y1', parseInt(localStorage.getItem(pai + '_y').replace('px','')) + 100)
+                        linha.setAttribute('x2', parseInt(window.getComputedStyle(d).left)+100)
+                        linha.setAttribute('y2', parseInt(window.getComputedStyle(d).top)+100)
+
+
+                    }
+                    else {//linha nao existe, entao é criada
+                        //console.log('nao ex')
+                        var pai = localStorage.getItem(idd + '_pai');
+
+                        svg.innerHTML += `<line id="linha_${d.id}"
+                    x1="${parseInt(localStorage.getItem(pai + '_x').replace('px','')) + 100}" y1="${parseInt(localStorage.getItem(pai + '_y').replace('px','')) + 100}" 
+                    x2="${parseInt(window.getComputedStyle(d).left)+100}" y2="${parseInt(window.getComputedStyle(d).top)+100}" 
+                    stroke="${localStorage.getItem(idd + '_cor')}"
+                     stroke-width="5">`
+                    }
+
+                }
+
+
+
+            })
+
+            document.body.addEventListener('mousemove', (e) => {
+                mouseX = (e.pageX - (d.offsetWidth / 2)) + 'px'
+                mouseY = (e.pageY - (d.offsetHeight / 5)) + 'px'
+                //paiAtual = document.getElementById(d.id - 1).id;
+                //console.log(paiAtual)
+
+            })
+
+            setInterval(() => {
+                if (bol) {
+                    d.style.cursor = 'pointer'
+                    d.style.top = mouseY
+                    d.style.left = mouseX
+                    paiAtual = d.id;
+
+
+
+                }
+                else {
+                    d.style.cursor = 'default'
+                }
+
+
+            }, 1);
+        }
+
+    }
+
+    setTimeout(() => {
+        setInterval(() => {
+        attLinhas()
+    }, 1);
+    }, 1000);
+
+    function attLinhas() {
+        svg.innerHTML = ''
+        for (let i = 0; i < 100; i++) {
+            if (localStorage.getItem(i + '_pai') && 
+            document.getElementById(i) && 
+            document.getElementById('svg') && 
+            localStorage.getItem(localStorage.getItem(i + '_pai') + '_x') && 
+            localStorage.getItem(localStorage.getItem(i + '_pai') + '_y') && 
+            document.getElementById(localStorage.getItem(i + '_pai'))) {
+                if (document.getElementById(localStorage.getItem(i + '_pai'))) {
+
+                    
+                    //console.log('local :' + localStorage.getItem(i + '_pai'))
+                    var pai = localStorage.getItem(i + '_pai');
+
+                    svg.innerHTML += `<line id="linha_${document.getElementById(i).id}" 
+                    x1="${parseInt(localStorage.getItem(pai + '_x'))+100}" 
+                    y1="${parseInt(localStorage.getItem(pai + '_y'))+50}"
+
+                    x2="${parseInt(window.getComputedStyle(document.getElementById(i)).left)+100}" 
+                    y2="${parseInt(window.getComputedStyle(document.getElementById(i)).top)+50}"   
+                    stroke="${localStorage.getItem(i + '_cor')}" 
+                    stroke-width="5">`
+                }
+            }
+
+
+        }
+
+    }
+
+    function rgbHex(rgbS) {
+        const rgb = rgbS.replace(/[^\d,]/g, '').split(',')
+        return "#" + ((1 << 24) + (parseInt(rgb[0]) << 16) +
+            (parseInt(rgb[1]) << 8) + parseInt(rgb[2])).toString(16).slice(1).toUpperCase();
+    }
+
+    function zoomIn() {
+        zoom += 0.1
+        document.body.style.zoom = parseFloat(zoom);
+        localStorage.setItem('zoomPagina', parseFloat(zoom))
+    }
+    function zoomOut() {
+        zoom -= 0.1
+        document.body.style.zoom = parseFloat(zoom);
+        localStorage.setItem('zoomPagina', parseFloat(zoom))
+    }
+
+
+    function ocultarInputColor() {
+        for (let i = 0; i < 1000; i++) {
+            if (document.getElementById('ic_' + i)) {
+                document.getElementById('ic_' + i).style.display = 'none'
+            }
+            if (document.getElementById('i_' + i)) {
+                document.getElementById('i_' + i).style.display = 'none'
+            }
+            if (document.getElementById('b_' + i)) {
+                document.getElementById('b_' + i).style.display = 'none'
+            }
+            if (document.getElementById('bm_' + i)) {
+                document.getElementById('bm_' + i).style.display = 'none'
+            }
+            if (document.getElementById('ba_' + i)) {
+                document.getElementById('ba_' + i).style.display = 'none'
+            }
+        }
+    }
+
+    function ExibirInputColor() {
+        for (let i = 0; i < 1000; i++) {
+            if (document.getElementById('ic_' + i)) {
+                document.getElementById('ic_' + i).style.display = 'block'
+            }
+            if (document.getElementById('i_' + i)) {
+                document.getElementById('i_' + i).style.display = 'block'
+            }
+            if (document.getElementById('b_' + i)) {
+                document.getElementById('b_' + i).style.display = 'block'
+            }
+            if (document.getElementById('bm_' + i)) {
+                document.getElementById('bm_' + i).style.display = 'block'
+            }
+            if (document.getElementById('ba_' + i)) {
+                document.getElementById('ba_' + i).style.display = 'block'
+            }
+        }
+    }
+</script>
+
+</html>
