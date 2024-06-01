@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt">
 
 <head>
@@ -14,9 +14,15 @@
 </body>
 <script>
 
-    
 
-    var controlesSendoExibidos = true;
+    document.head.innerHTML += `
+    <style>
+    *{
+        user-select: none;
+    }
+</style>`
+
+    var controlesSendoExibidos = false;
 
     var zoom = 1;
     if (localStorage.getItem('zoomPagina')) {
@@ -37,6 +43,14 @@
     document.body.innerHTML = "<svg id='svg' style='width:100%;height:100%'></svg>"
     const svg = document.getElementById('svg');
 
+    if (localStorage.getItem('corSVG')) {
+        svg.style.backgroundColor = localStorage.getItem('corSVG')
+        document.body.style.backgroundColor = localStorage.getItem('corSVG')
+    }
+    else {
+        svg.style.backgroundColor = 'lightgray'
+        document.body.style.backgroundColor = 'lightgray'
+    }
 
 
 
@@ -44,6 +58,8 @@
     //pre config
     document.body.style.width = '5000px'
     document.body.style.height = '5000px'
+    document.body.style.padding = '0'
+    document.body.style.margin = '0'
     document.body.style.backgroundColor = 'rgb(234, 234, 234)'
 
 
@@ -64,13 +80,17 @@
 
 
     menu.innerHTML = `
-    <details>
+    <details id="details">
     <summary>Opções</summary>
     <ul>
+        <li id='loadShare'>Carregar / Compartilhar</li>
         <li id='pp'>Reiniciar</li>
         <li id='zoomin'>Ampliar +</li>
         <li id='zoomout'>Diminuir -</li>
         <li id='Controles'>Exibir/Ocultar Controles</li>
+        <li style="cursor:pointer">Cor de Fundo: <input type="color" style="cursor:pointer;border:none;background-color:brown" id="corFundo"></li>
+        <li style="cursor:pointer">Cor da Fonte: <input type="color" style="cursor:pointer;border:none;background-color:brown" id="corFonte"></li>
+
     </ul>
 </details>
     `
@@ -81,9 +101,9 @@
     pp.style.cursor = 'pointer'
     pp.style.padding = '5px'
 
-   // const redesenhar = document.getElementById('redesenhar')
-   // redesenhar.style.cursor = 'pointer'
-   // redesenhar.style.padding = '5px'
+    // const redesenhar = document.getElementById('redesenhar')
+    // redesenhar.style.cursor = 'pointer'
+    // redesenhar.style.padding = '5px'
 
     const zoomin = document.getElementById('zoomin')
     zoomin.style.cursor = 'pointer'
@@ -97,10 +117,15 @@
     Controles.style.cursor = 'pointer'
     Controles.style.padding = '5px'
 
+    const loadShare = document.getElementById('loadShare')
+    loadShare.style.cursor = 'pointer'
+    loadShare.style.padding = '5px'
+
 
 
 
     Controles.addEventListener('click', () => {
+        document.getElementById('details').open = false
         if (!controlesSendoExibidos) {
             ExibirInputColor()
             controlesSendoExibidos = true
@@ -122,13 +147,12 @@
         window.location.reload()
     })
 
-  //  redesenhar.addEventListener('click', () => {
-  //      attLinhas()
-  //      //window.location.reload()
-  //  })
+    loadShare.addEventListener('click', () => {
+        criarJanelaComp();
+    })
 
 
-    var ind = 0; 
+    var ind = 0;
 
 
 
@@ -165,24 +189,42 @@
     //console.log(ind)
     //console.log(ind2)
 
+    const corFundo = document.getElementById('corFundo');
+    corFundo.addEventListener('change', () => {
+        localStorage.setItem('corSVG', corFundo.value)
+        svg.style.backgroundColor = localStorage.getItem('corSVG')
+        document.body.style.backgroundColor = localStorage.getItem('corSVG')
+    })
+
+
+    const corFonte = document.getElementById('corFonte');
+    corFonte.addEventListener('change', () => {
+        localStorage.setItem('corFonte', corFonte.value)
+        MudarcorFonte(localStorage.getItem('corFonte'))
+    })
+
 
     function criar(father, idd, ctu, xxxxx = '10px', yyyyy = '40px', cor = '#ddd5d5') {
         if (ctu != '') {
-             
-            console.log('ind: '+ind)
+
+            //console.log('ind: ' + ind)
             const d = document.createElement('div')
             const i = document.createElement('input')
             const ic = document.createElement('input')
             const b = document.createElement('button')
-            const bm = document.createElement('button')
+            //const bm = document.createElement('button')
             const ba = document.createElement('button')
             const p = document.createElement('p')
+
+            if (localStorage.getItem('corFonte')) {
+                p.style.color = localStorage.getItem('corFonte');
+            }
 
 
             ic.id = 'ic_' + idd;
             i.id = 'i_' + idd;
             b.id = 'b_' + idd;
-            bm.id = 'bm_' + idd;
+            //bm.id = 'bm_' + idd;
             ba.id = 'ba_' + idd;
 
 
@@ -192,14 +234,16 @@
             d.style.color = 'rgb(0, 0, 0)'
             d.style.position = 'absolute'
             d.style.padding = '10px'
-            d.style.borderEndEndRadius = '5px'
+            d.style.borderRadius = '15px'
             //----------------------------------
 
 
-            d.style.width = '200px'
+            d.style.minWidth = '100px'
+            d.style.maxWidth = '200px'
             d.style.alignContent = 'center'
             d.style.alignItems = 'center'
             d.style.textAlign = 'center'
+            d.style.cursor = 'hand'
 
             i.style.width = '96%'
 
@@ -208,21 +252,23 @@
 
 
             b.style.width = '100%'
-            bm.style.width = '100%'
+            //bm.style.width = '100%'
             ba.style.width = '100%'
 
             p.textContent = ctu;
+            p.style.userSelect = 'none'
+
             i.placeholder = 'Proximo passo...'
             //i.value=ctu;
             b.innerHTML = "Criar";
-            bm.innerHTML = "Movimentar";
+            //bm.innerHTML = "Movimentar";
             ba.innerHTML = "Apagar";
             d.append(p)
             d.append(i)
             d.append(ic)
             d.append(b)
             if (idd != 0) {
-                d.append(bm)
+                //d.append(bm)
                 d.append(ba)
             }
 
@@ -262,7 +308,7 @@
 
             localStorage.setItem(idd + '_pai', father)
 
-            
+
 
             d.id = idd;
 
@@ -275,11 +321,19 @@
 
             document.body.append(d)
             ind++;
-            b.addEventListener('click', () => {
+            i.addEventListener('mousedown', (e) => {
+                e.stopPropagation()
+            })
+            ic.addEventListener('mousedown', (e) => {
+                e.stopPropagation()
+            })
+            b.addEventListener('mousedown', (e) => {
+                e.stopPropagation()
                 criar(d.id, ind, i.value, '10px', '10px', ic.value.toString())
 
             })
-            ba.addEventListener('click', () => {
+            ba.addEventListener('mousedown', (e) => {
+                e.stopPropagation()
                 d.remove()
                 localStorage.removeItem(d.id + '_x')
                 localStorage.removeItem(d.id + '_y')
@@ -290,16 +344,24 @@
             })
 
 
-            bm.addEventListener('click', (e) => {
-                bol = !bol;
-                
-            })
-            i.addEventListener('click', (e) => {
-                localStorage.setItem(idd + '_pai',father);
-                paiAtual = localStorage.getItem(idd + '_pai');
-                console.log('storage pai :'+localStorage.getItem(idd + '_pai'))
-            })
+            // bm.addEventListener('click', (e) => {
+            //     bol = !bol;
+            // })
             d.addEventListener('mousedown', (e) => {
+                bol = !bol;
+            })
+
+
+
+
+            i.addEventListener('click', (e) => {
+                localStorage.setItem(idd + '_pai', father);
+                paiAtual = localStorage.getItem(idd + '_pai');
+                //console.log('storage pai :' + localStorage.getItem(idd + '_pai'))
+            })
+
+
+            d.addEventListener('mouseup', (e) => {
 
                 bol = false;
                 localStorage.setItem(idd + '_x', d.style.left)
@@ -317,10 +379,10 @@
                         //console.log('existe')
                         var pai = localStorage.getItem(idd + '_pai');
                         var linha = document.getElementById('linha_' + d.id)
-                        linha.setAttribute('x1', parseInt(localStorage.getItem(pai + '_x').replace('px','')) + 100)
-                        linha.setAttribute('y1', parseInt(localStorage.getItem(pai + '_y').replace('px','')) + 100)
-                        linha.setAttribute('x2', parseInt(window.getComputedStyle(d).left)+100)
-                        linha.setAttribute('y2', parseInt(window.getComputedStyle(d).top)+100)
+                        linha.setAttribute('x1', parseInt(localStorage.getItem(pai + '_x').replace('px', '')) + 100)
+                        linha.setAttribute('y1', parseInt(localStorage.getItem(pai + '_y').replace('px', '')) + 100)
+                        linha.setAttribute('x2', parseInt(window.getComputedStyle(d).left) + 100)
+                        linha.setAttribute('y2', parseInt(window.getComputedStyle(d).top) + 100)
 
 
                     }
@@ -329,8 +391,8 @@
                         var pai = localStorage.getItem(idd + '_pai');
 
                         svg.innerHTML += `<line id="linha_${d.id}"
-                    x1="${parseInt(localStorage.getItem(pai + '_x').replace('px','')) + 100}" y1="${parseInt(localStorage.getItem(pai + '_y').replace('px','')) + 100}" 
-                    x2="${parseInt(window.getComputedStyle(d).left)+100}" y2="${parseInt(window.getComputedStyle(d).top)+100}" 
+                    x1="${parseInt(localStorage.getItem(pai + '_x').replace('px', '')) + 100}" y1="${parseInt(localStorage.getItem(pai + '_y').replace('px', '')) + 100}" 
+                    x2="${parseInt(window.getComputedStyle(d).left) + 100}" y2="${parseInt(window.getComputedStyle(d).top) + 100}" 
                     stroke="${localStorage.getItem(idd + '_cor')}"
                      stroke-width="5">`
                     }
@@ -341,13 +403,16 @@
 
             })
 
+
+
             document.body.addEventListener('mousemove', (e) => {
-                mouseX = (e.pageX - (d.offsetWidth / 2)) + 'px'
-                mouseY = (e.pageY - (d.offsetHeight / 5)) + 'px'
+                mouseX = (e.pageX - 10) + 'px'
+                mouseY = (e.pageY - 10) + 'px'
                 //paiAtual = document.getElementById(d.id - 1).id;
-                //console.log(paiAtual)
+                //console.log(e.pageY)
 
             })
+
 
             setInterval(() => {
                 if (bol) {
@@ -369,33 +434,33 @@
 
     }
 
-    setTimeout(() => {
+     
         setInterval(() => {
-        attLinhas()
-    }, 1);
-    }, 1000);
+            attLinhas()
+        }, 1);
+    
 
     function attLinhas() {
         svg.innerHTML = ''
         for (let i = 0; i < 100; i++) {
-            if (localStorage.getItem(i + '_pai') && 
-            document.getElementById(i) && 
-            document.getElementById('svg') && 
-            localStorage.getItem(localStorage.getItem(i + '_pai') + '_x') && 
-            localStorage.getItem(localStorage.getItem(i + '_pai') + '_y') && 
-            document.getElementById(localStorage.getItem(i + '_pai'))) {
+            if (localStorage.getItem(i + '_pai') &&
+                document.getElementById(i) &&
+                document.getElementById('svg') &&
+                localStorage.getItem(localStorage.getItem(i + '_pai') + '_x') &&
+                localStorage.getItem(localStorage.getItem(i + '_pai') + '_y') &&
+                document.getElementById(localStorage.getItem(i + '_pai'))) {
                 if (document.getElementById(localStorage.getItem(i + '_pai'))) {
 
-                    
+
                     //console.log('local :' + localStorage.getItem(i + '_pai'))
                     var pai = localStorage.getItem(i + '_pai');
 
                     svg.innerHTML += `<line id="linha_${document.getElementById(i).id}" 
-                    x1="${parseInt(localStorage.getItem(pai + '_x'))+100}" 
-                    y1="${parseInt(localStorage.getItem(pai + '_y'))+50}"
+                    x1="${parseInt(localStorage.getItem(pai + '_x')) + (parseInt(window.getComputedStyle(document.getElementById(pai)).width)/2)}" 
+                    y1="${parseInt(localStorage.getItem(pai + '_y')) + (parseInt(window.getComputedStyle(document.getElementById(pai)).height)/2)}"
 
-                    x2="${parseInt(window.getComputedStyle(document.getElementById(i)).left)+100}" 
-                    y2="${parseInt(window.getComputedStyle(document.getElementById(i)).top)+50}"   
+                    x2="${parseInt(window.getComputedStyle(document.getElementById(i)).left) + (parseInt(window.getComputedStyle(document.getElementById(i)).width)/2)}" 
+                    y2="${parseInt(window.getComputedStyle(document.getElementById(i)).top) + (parseInt(window.getComputedStyle(document.getElementById(i)).height)/2)}"   
                     stroke="${localStorage.getItem(i + '_cor')}" 
                     stroke-width="5">`
                 }
@@ -463,6 +528,106 @@
             }
         }
     }
+
+
+    function MudarcorFonte(corr = 'white') {
+        let a = document.querySelectorAll('p')
+        a.forEach(e => {
+            e.style.color = corr
+        });
+        //console.log(corr)
+    }
+
+
+    function loadJSON(jsons) {
+        if (jsons !== '') {
+            localStorage.clear();
+            let jb = JSON.parse(jsons)
+            for (let k in jb) {
+                localStorage.setItem(k, jb[k])
+            }
+            window.location.reload()
+        }
+    }
+
+
+
+    function gerarJSON() {
+        let json = {};
+        for (let i = 0; i < localStorage.length; i++) {
+            let k = localStorage.key(i);
+            json[k] = localStorage.getItem(k)
+        }
+        return JSON.stringify(json)
+    }
+
+    
+    function criarJanelaComp() {
+
+        document.getElementById('details').open = false
+
+        const janelaCompartilhamento = document.createElement('div')
+        janelaCompartilhamento.style.backgroundColor = 'rgb(221, 213, 213)'
+        janelaCompartilhamento.style.boxShadow = '0px 0px 30px gray'
+        janelaCompartilhamento.style.color = 'rgb(0, 0, 0)'
+        janelaCompartilhamento.style.position = 'fixed'
+        janelaCompartilhamento.style.padding = '10px'
+        janelaCompartilhamento.style.borderRadius = '10px'
+        janelaCompartilhamento.style.left = '25%'
+        janelaCompartilhamento.style.width = '50%'
+        janelaCompartilhamento.style.top = '50px'
+        //---------------------------------------
+        const textarea_janelaCompartilhamento = document.createElement('textarea')
+        textarea_janelaCompartilhamento.id = 'textarea'
+        textarea_janelaCompartilhamento.style.backgroundColor = 'beije'
+        textarea_janelaCompartilhamento.style.resize = 'none'
+        textarea_janelaCompartilhamento.style.width = '99%'
+        textarea_janelaCompartilhamento.style.height = '300px'
+        textarea_janelaCompartilhamento.style.border = 'none'
+        textarea_janelaCompartilhamento.style.borderRadius = '10px'
+        textarea_janelaCompartilhamento.style.paddingTop = '10px'
+        textarea_janelaCompartilhamento.style.paddingBottom = '10px'
+        textarea_janelaCompartilhamento.style.marginBottom = '10px'
+        textarea_janelaCompartilhamento.placeholder = 'Cole o codigo aqui...'
+        //--------------------------------------------------------
+        const botaoLoad_janelaCompartilhamento = document.createElement('button')
+        botaoLoad_janelaCompartilhamento.style.backgroundColor = 'rgb(100, 213, 100)'
+        botaoLoad_janelaCompartilhamento.style.width = '99.5%'
+        botaoLoad_janelaCompartilhamento.style.border = 'none'
+        botaoLoad_janelaCompartilhamento.style.borderRadius = '10px'
+        botaoLoad_janelaCompartilhamento.style.paddingTop = '10px'
+        botaoLoad_janelaCompartilhamento.style.paddingBottom = '10px'
+        botaoLoad_janelaCompartilhamento.textContent = 'Carregar (seu fluxograma atual será perdido)'
+        botaoLoad_janelaCompartilhamento.style.marginBottom = '10px'
+        //------------------------------------
+        const botaoGerar_janelaCompartilhamento = document.createElement('button')
+        botaoGerar_janelaCompartilhamento.style.backgroundColor = 'rgb(100, 213, 100)'
+        botaoGerar_janelaCompartilhamento.style.width = '99.5%'
+        botaoGerar_janelaCompartilhamento.style.border = 'none'
+        botaoGerar_janelaCompartilhamento.style.borderRadius = '10px'
+        botaoGerar_janelaCompartilhamento.style.paddingTop = '10px'
+        botaoGerar_janelaCompartilhamento.style.paddingBottom = '10px'
+        botaoGerar_janelaCompartilhamento.textContent = 'Gerar o seu codigo'
+        botaoGerar_janelaCompartilhamento.style.marginBottom = '10px'
+        //------------------------------------
+        janelaCompartilhamento.append(textarea_janelaCompartilhamento)
+        janelaCompartilhamento.append(botaoLoad_janelaCompartilhamento)
+        janelaCompartilhamento.append(botaoGerar_janelaCompartilhamento)
+        document.body.append(janelaCompartilhamento)
+
+        botaoGerar_janelaCompartilhamento.addEventListener('click', () => {
+            textarea_janelaCompartilhamento.value=gerarJSON()
+        })
+        botaoLoad_janelaCompartilhamento.addEventListener('click', () => {
+            loadJSON(textarea_janelaCompartilhamento.value)
+        })
+        janelaCompartilhamento.addEventListener('mouseleave', () => {
+            janelaCompartilhamento.remove()
+        })
+    }
+
+    ocultarInputColor()
+
 </script>
 
 </html>
